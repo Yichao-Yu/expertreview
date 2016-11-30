@@ -1,0 +1,34 @@
+{
+  "intents": [
+    {
+      "intent": "ProductReviewSearchIntent",
+      "slots": [
+        {
+          "name": "Product",
+          "type": "LIST_OF_PRODUCTS"
+        }
+      ]
+    },
+    {
+      "intent": "ProductSearchIntent",
+      "slots": [
+        {
+          "name": "Product",
+          "type": "LIST_OF_PRODUCTS"
+        }
+      ]
+    },
+    {
+      "intent": "OtherReviewResultIntent"
+    },
+    {
+      "intent": "AMAZON.RepeatIntent"
+    },
+    {
+      "intent": "AMAZON.YesIntent"
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    }
+  ]
+}

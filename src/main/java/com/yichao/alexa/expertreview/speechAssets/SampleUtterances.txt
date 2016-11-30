@@ -1,0 +1,28 @@
+ProductSearchIntent Search {Product}
+ProductSearchIntent Help me find {Product}
+ProductSearchIntent Try to look up {Product}
+ProductSearchIntent Fuzzy search {Product}
+ProductSearchIntent Find a product called {Product}
+
+ProductReviewSearchIntent Get review for {Product}
+ProductReviewSearchIntent Get a review for {Product}
+ProductReviewSearchIntent Get the review for {Product}
+ProductReviewSearchIntent Find review of {Product}
+ProductReviewSearchIntent Find a review of {Product}
+ProductReviewSearchIntent Find the review of {Product}
+ProductReviewSearchIntent Find {Product} review
+ProductReviewSearchIntent Find a profession opinion on {Product}
+ProductReviewSearchIntent Find an expert's review on {Product}
+ProductReviewSearchIntent Find an expert's open on {Product}
+
+NumbereSelectionIntent
+
+OtherReviewResultIntent No that is not what I really want
+OtherReviewResultIntent No that is not what I want
+OtherReviewResultIntent No that is not right
+OtherReviewResultIntent No what else you got
+OtherReviewResultIntent No show me other review search results
+
+AMAZON.RepeatIntent repeat
+AMAZON.RepeatIntent say that again
+AMAZON.RepeatIntent repeat that
