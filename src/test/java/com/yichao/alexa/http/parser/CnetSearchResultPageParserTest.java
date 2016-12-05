@@ -1,7 +1,5 @@
 package com.yichao.alexa.http.parser;
 
-import com.google.inject.Inject;
-import com.yichao.alexa.expertreview.intent.BuiltInRepeatIntentHandler;
 import com.yichao.alexa.expertreview.intent.BuiltInYesIntentHandler;
 import com.yichao.alexa.http.client.CnetPageClient;
 import com.yichao.alexa.model.ReviewDetail;
@@ -12,6 +10,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 
@@ -29,7 +28,8 @@ public class CnetSearchResultPageParserTest extends BaseIntegrationTest {
     private BuiltInYesIntentHandler builtInYesIntentHandler;
 
     @Inject
-    private BuiltInRepeatIntentHandler builtInRepeatIntentHandler;
+    public CnetSearchResultPageParserTest() {
+    }
 
     @Test
     public void testSearch() throws IOException {

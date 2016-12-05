@@ -11,10 +11,11 @@ public class IntentRequestHandlerModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(BuiltInYesIntentHandler.class);
-        bind(BuiltInRepeatIntentHandler.class);
-        bind(ProductSearchIntentHandler.class);
-        bind(ProductReviewSearchIntentHandler.class);
-        bind(OtherReviewIntentHandler.class);
+        bind(BuiltInYesIntentHandler.class).toInstance(new BuiltInYesIntentHandler());
+        bind(BuiltInRepeatIntentHandler.class).toInstance(new BuiltInRepeatIntentHandler());
+        bind(ProductSearchIntentHandler.class).toInstance(new ProductSearchIntentHandler());
+        bind(ProductReviewSearchIntentHandler.class).toInstance(new ProductReviewSearchIntentHandler());
+        bind(OtherReviewIntentHandler.class).toInstance(new OtherReviewIntentHandler());
+
     }
 }

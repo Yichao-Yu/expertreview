@@ -3,13 +3,11 @@ package com.yichao.alexa.expertreview.intent;
 import com.amazon.speech.slu.Intent;
 import com.amazon.speech.speechlet.Session;
 import com.amazon.speech.speechlet.SpeechletResponse;
-import com.google.inject.Injector;
 import com.yichao.alexa.model.ReviewDetail;
 import com.yichao.alexa.model.ReviewSearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import static com.yichao.alexa.expertreview.SessionConstant.SESSION_LAST_RESPONSE;
@@ -19,11 +17,6 @@ import static com.yichao.alexa.expertreview.SessionConstant.SESSION_PROMPTED_SEA
 public class BuiltInYesIntentHandler extends BaseIntentHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BuiltInYesIntentHandler.class);
-
-    @Inject
-    BuiltInYesIntentHandler(Injector injector) {
-        injector.injectMembers(this);
-    }
 
     @Override
     protected IntentType getIntentType() {

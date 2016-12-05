@@ -4,14 +4,12 @@ import com.amazon.speech.speechlet.Session;
 import com.amazon.speech.speechlet.SpeechletResponse;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Injector;
 import com.yichao.alexa.expertreview.SpeechletResponseUtil;
 import com.yichao.alexa.http.client.CnetPageClient;
 import com.yichao.alexa.http.parser.CnetSearchResultPageParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
@@ -32,13 +30,10 @@ public abstract class BaseIntentHandler implements IntentRequestHandler {
     protected CnetPageClient cnetPageClient;
     @Inject
     protected CnetSearchResultPageParser cnetSearchResultPageParser;
-    @Inject
-    @Named("intentHandlerMap")
-    protected Map<IntentType, IntentRequestHandler> intentHandlerMap;
 
-    @PostConstruct
-    private void register() {
-        LOGGER.info("add IntentType {} for IntentRequestHandler {}", getIntentType(), this.getClass());
+    @Inject
+    public void registerHandler(@Named("intentHandlerMap") final Map<IntentType, IntentRequestHandler> intentHandlerMap) {
+        LOGGER.debug("Register handler {} to intentHandlerMap", getClass().getSimpleName());
         intentHandlerMap.put(getIntentType(), this);
     }
 

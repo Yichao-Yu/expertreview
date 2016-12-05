@@ -3,12 +3,10 @@ package com.yichao.alexa.expertreview.intent;
 import com.amazon.speech.slu.Intent;
 import com.amazon.speech.speechlet.Session;
 import com.amazon.speech.speechlet.SpeechletResponse;
-import com.google.inject.Injector;
 import com.yichao.alexa.model.ReviewSearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
 
@@ -18,11 +16,6 @@ import static com.yichao.alexa.expertreview.SessionConstant.*;
 public class ProductReviewSearchIntentHandler extends BaseIntentHandler implements IntentRequestHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductReviewSearchIntentHandler.class);
-
-    @Inject
-    ProductReviewSearchIntentHandler(Injector injector) {
-        injector.injectMembers(this);
-    }
 
     @Override
     protected IntentType getIntentType() {
