@@ -16,13 +16,16 @@ public class ExpertReviewSpeechlet implements Speechlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExpertReviewSpeechlet.class);
 
-    ExpertReviewSpeechlet(final Injector injector) {
+    private Map<IntentType, IntentRequestHandler> intentHandlerMap;
+
+    public ExpertReviewSpeechlet(final Injector injector) {
         injector.injectMembers(this);
     }
 
     @Inject
-    @Named("intentHandlerMap")
-    Map<IntentType, IntentRequestHandler> intentHandlerMap;
+    private void setIntentHandlerMap(@Named("intentHandlerMap") final Map<IntentType, IntentRequestHandler> intentHandlerMap) {
+        this.intentHandlerMap = intentHandlerMap;
+    }
 
     @Override
     public void onSessionStarted(SessionStartedRequest request, Session session) throws SpeechletException {
@@ -41,6 +44,10 @@ public class ExpertReviewSpeechlet implements Speechlet {
 
         final Intent intent = request.getIntent();
         final String intentName = intent.getName();
+
+        if (LOGGER.isDebugEnabled()) {
+            intentHandlerMap.entrySet().forEach(e -> LOGGER.debug("key, value: {}, {}", e.getKey(), e.getValue()));
+        }
 
         final IntentType intentType = IntentType.fromValue(intentName);
         if (intentHandlerMap.containsKey(intentType)) {

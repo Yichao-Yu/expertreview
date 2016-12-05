@@ -8,10 +8,9 @@ import org.junit.Before;
 
 public abstract class BaseIntegrationTest {
 
-    protected Injector injector = Guice.createInjector(new ExpertReviewModule(), new IntentRequestHandlerModule());
-
     @Before
     public void setup() {
+        Injector injector = Guice.createInjector(new ExpertReviewModule());
         injector.injectMembers(this);
     }
 }
