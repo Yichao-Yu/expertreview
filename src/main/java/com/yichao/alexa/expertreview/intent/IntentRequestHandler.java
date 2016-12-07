@@ -2,6 +2,7 @@ package com.yichao.alexa.expertreview.intent;
 
 import com.amazon.speech.slu.Intent;
 import com.amazon.speech.speechlet.Session;
+import com.amazon.speech.speechlet.SpeechletException;
 import com.amazon.speech.speechlet.SpeechletResponse;
 
 /**
@@ -15,6 +16,24 @@ public interface IntentRequestHandler {
      * @param session
      * @return
      */
-    SpeechletResponse handleIntentRequest(Intent intent, Session session);
+    SpeechletResponse handleIntentRequest(Intent intent, Session session) throws SpeechletException;
+
+    /**
+     * handle yes intent in a custom intent handler
+     *
+     * @param intent
+     * @param session
+     * @return
+     */
+    SpeechletResponse handleYesIntentRequest(Intent intent, Session session) throws SpeechletException;
+
+    /**
+     * handle no intent in a custom intent handler
+     *
+     * @param intent
+     * @param session
+     * @return
+     */
+    SpeechletResponse handleNoIntentRequest(Intent intent, Session session) throws SpeechletException;
 
 }

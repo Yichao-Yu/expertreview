@@ -18,9 +18,8 @@ public class ReviewDetail {
         this.reviewSummary = reviewSummary;
     }
 
-    public String toResponseString() {
+    public String toSummarySsmlString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("<speak>");
         sb.append("<s>");
         sb.append(product);
         sb.append("</s>");
@@ -31,8 +30,18 @@ public class ReviewDetail {
         sb.append("<s>");
         sb.append(productTitle);
         sb.append("</s>");
-        sb.append(reviewSummary.toResponseString());
-        sb.append("</speak>");
+        sb.append(reviewSummary.toRateSsmlString());
+        return sb.toString();
+    }
+
+    public String toSummaryString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(productTitle);
+        sb.append(". ");
+        sb.append("Reviewed by ");
+        sb.append(author);
+        sb.append(". ");
+        sb.append(reviewSummary.toRateString());
         return sb.toString();
     }
 

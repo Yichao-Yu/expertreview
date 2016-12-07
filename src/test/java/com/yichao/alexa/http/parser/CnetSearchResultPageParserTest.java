@@ -24,8 +24,6 @@ public class CnetSearchResultPageParserTest extends BaseIntegrationTest {
     @Inject
     private CnetSearchResultPageParser cnetSearchResultPageParser;
 
-    @Inject
-    private BuiltInYesIntentHandler builtInYesIntentHandler;
 
     @Inject
     public CnetSearchResultPageParserTest() {

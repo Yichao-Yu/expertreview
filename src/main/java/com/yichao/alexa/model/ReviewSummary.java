@@ -17,29 +17,32 @@ public class ReviewSummary {
         this.theBottomLine = theBottomLine;
     }
 
-    public String toResponseString() {
-        final String highlightBreak = "<break time=\"0.5s\"/>";
+    public String toRateSsmlString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("<s>");
         sb.append("Expert rating is ");
         sb.append(rating);
         sb.append(" out of five.");
         sb.append("</s>");
-        sb.append("<s>");
-        sb.append("The Good ");
-        sb.append(highlightBreak);
+        return sb.toString();
+    }
+
+    public String toRateString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Expert rating is ");
+        sb.append(rating);
+        sb.append(" out of five.");
+        return sb.toString();
+    }
+
+    public String toGoodBadBottomLineString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("The Good: ");
         sb.append(theGood);
-        sb.append("</s>");
-        sb.append("<s>");
-        sb.append("The Bad");
-        sb.append(highlightBreak);
+        sb.append("The Bad: ");
         sb.append(theBad);
-        sb.append("</s>");
-        sb.append("<s>");
-        sb.append("The Bottom Line");
-        sb.append(highlightBreak);
+        sb.append("The Bottom Line: ");
         sb.append(theBottomLine);
-        sb.append("</s>");
         return sb.toString();
     }
 

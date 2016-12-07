@@ -25,13 +25,14 @@ public class CnetSearchResultPageParser {
     private static final String SELECTOR_ITEM_LIST = "section.items > .searchItem.product";
     private static final String SELECTOR_ITEM_INFO = ".itemInfo";
     private static final String SELECTOR_TYPE = ".type";
+    private static final String SELECTOR_IMAGE = "noscript img";
 
     // review page
     private static final String SELECTOR_PRODUCT = "h1.headline .itemreviewed";
     private static final String SELECTOR_PRODUCT_TITLE = "h2.productTitle";
     private static final String SELECTOR_AUTHOR = "div.metaData .author > a";
     private static final String SELECTOR_SUMMARY = "div.scoreCard";
-    private static final String SELECTOR_RATING = "div.editorsRating  span.rating";
+    private static final String SELECTOR_RATING = "div.editorsRating span.rating";
     private static final String SELECTOR_QUICK_INFO = "div.quickInfo";
     private static final String SELECTOR_GOOD = ".theGood > span";
     private static final String SELECTOR_BAD = ".theBad > span";
@@ -50,8 +51,9 @@ public class CnetSearchResultPageParser {
             final Element itemInfo = elem.select(SELECTOR_ITEM_INFO).first();
             if (!itemInfo.select(SELECTOR_TYPE).isEmpty()) { // not have type line
                 Element anchor = itemInfo.select("a").first();
+                Element img = elem.select(SELECTOR_IMAGE).first();
                 if ("Review".equalsIgnoreCase(itemInfo.select(SELECTOR_TYPE).first().text())) {
-                    resultInfo.add(new ReviewSearchResult(anchor.attr("href"), anchor.text(), ReviewType.EDITOR_REVIEW));
+                    resultInfo.add(new ReviewSearchResult(anchor.attr("href"), anchor.text(), ReviewType.EDITOR_REVIEW, img.attr("src")));
                 }
             }
         });

@@ -2,6 +2,7 @@ package com.yichao.alexa.expertreview.intent;
 
 import com.amazon.speech.slu.Intent;
 import com.amazon.speech.speechlet.Session;
+import com.amazon.speech.speechlet.SpeechletException;
 import com.amazon.speech.speechlet.SpeechletResponse;
 import com.yichao.alexa.model.ReviewSearchResult;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ public class ProductSearchIntentHandler extends BaseIntentHandler {
         return IntentType.PRODUCT_SEARCH;
     }
 
-    public SpeechletResponse handleIntentRequest(final Intent intent, final Session session) {
+    public SpeechletResponse handleIntentRequest(final Intent intent, final Session session) throws SpeechletException {
         LOGGER.info("Handling product search");
         final String product = intent.getSlot("Product").getValue();
         LOGGER.debug("product is {}", product);
@@ -43,7 +44,7 @@ public class ProductSearchIntentHandler extends BaseIntentHandler {
         final int found = getResultSetSize(results);
         if (found == 0) {
             LOGGER.info("No product {} was found", product);
-            return newTellResponse("Sorry. I did not find any product called " + product, false);
+            return newTellResponse("Sorry, no product called " + product + " has been found.", false);
         }
         String responseString = "Find " + found + " results: ";
         for (int i = 0; i < found; i++) {
@@ -51,7 +52,6 @@ public class ProductSearchIntentHandler extends BaseIntentHandler {
         }
         responseString += "Which one is the one you wanted?";
 
-        LOGGER.debug("Response string: [{}]", responseString);
         session.setAttribute(SESSION_LAST_RESPONSE, responseString);
         return newAskResponse(responseString, false, "", false);
     }
@@ -66,6 +66,6 @@ public class ProductSearchIntentHandler extends BaseIntentHandler {
         session.removeAttribute(SESSION_LAST_RESPONSE);
         session.removeAttribute(SESSION_SEARCHED_PRODUCT);
         session.removeAttribute(SESSION_SEARCH_RESULTS);
-        session.removeAttribute(SESSION_PROMPTED_SEARCH_RESULT);
+        session.removeAttribute(SESSION_PROMPTED_REVIEW);
     }
 }

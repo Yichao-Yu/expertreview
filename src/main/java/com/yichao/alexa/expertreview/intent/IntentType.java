@@ -8,6 +8,7 @@ public enum IntentType {
     PRODUCT_REVIEW_SEARCH("ProductReviewSearchIntent"),
     OTHER_REVIEW("OtherReviewResultIntent"),
     BUILTIN_YES("AMAZON.YesIntent"),
+    BUILTIN_NO("AMAZON.NoIntent"),
     BUILTIN_REPEAT("AMAZON.RepeatIntent");
 
     private String intent;

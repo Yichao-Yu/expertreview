@@ -16,12 +16,11 @@ public class ExpertReviewSpeechletRequestStreamHandler extends SpeechletRequestS
 
     static {
         supportedApplicationIds = new HashSet<String>();
-        supportedApplicationIds.add("{api here}");
+        supportedApplicationIds.add("amzn1.ask.skill.a4ca5824-0a4a-4420-9e38-a95c0cd1386c");
     }
 
     public ExpertReviewSpeechletRequestStreamHandler() {
         super(new ExpertReviewSpeechlet(Guice.createInjector(new ExpertReviewModule())), supportedApplicationIds);
-
     }
 
 }

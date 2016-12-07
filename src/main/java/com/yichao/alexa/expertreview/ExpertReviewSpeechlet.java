@@ -45,10 +45,9 @@ public class ExpertReviewSpeechlet implements Speechlet {
         final Intent intent = request.getIntent();
         final String intentName = intent.getName();
 
-        LOGGER.debug("{}", intentHandlerMap);
-        LOGGER.debug("{}", intentHandlerMap.entrySet());
-        LOGGER.debug("{}", intentHandlerMap.entrySet().iterator().next());
-        intentHandlerMap.entrySet().forEach(e -> LOGGER.info("key, value: {}, {}", e.getKey(), e.getValue()));
+        if (LOGGER.isDebugEnabled()) {
+            intentHandlerMap.entrySet().forEach(e -> LOGGER.debug("key, value: {}, {}", e.getKey(), e.getValue()));
+        }
 
         final IntentType intentType = IntentType.fromValue(intentName);
         if (intentHandlerMap.containsKey(intentType)) {
