@@ -1,9 +1,6 @@
 package com.yichao.alexa.http.parser;
 
-import com.yichao.alexa.model.ReviewDetail;
-import com.yichao.alexa.model.ReviewSearchResult;
-import com.yichao.alexa.model.ReviewSummary;
-import com.yichao.alexa.model.ReviewType;
+import com.yichao.alexa.model.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -32,6 +29,10 @@ public class CnetSearchResultPageParser {
     private static final String SELECTOR_PRODUCT_TITLE = "h2.productTitle";
     private static final String SELECTOR_AUTHOR = "div.metaData .author > a";
     private static final String SELECTOR_SUMMARY = "div.scoreCard";
+    private static final String SELECTOR_PRICE_SUMMARY = "div.priceRange";
+    private static final String SELECTOR_MSRP = "a.msrpUnit span.msrp";
+    private static final String SELECTOR_LOW_PRICE = "span";
+    private static final String SELECTOR_PRICES = "ul > li.reseller";
     private static final String SELECTOR_RATING = "div.editorsRating span.rating";
     private static final String SELECTOR_QUICK_INFO = "div.quickInfo";
     private static final String SELECTOR_GOOD = ".theGood > span";
@@ -67,6 +68,16 @@ public class CnetSearchResultPageParser {
         final String productName = doc.select(SELECTOR_PRODUCT).first().text();
         final String title = doc.select(SELECTOR_PRODUCT_TITLE).first().text();
         final String author = doc.select(SELECTOR_AUTHOR).first().text();
+        final Elements priceSummary = doc.select(SELECTOR_PRICE_SUMMARY);
+        final String msrp = priceSummary.select(SELECTOR_MSRP).first().text();
+        final String lowPrice = getContent(priceSummary.select(SELECTOR_LOW_PRICE), "lowPrice");
+        final Elements prices = doc.select(SELECTOR_PRICES);
+        final List<ProductSeller> sellers = new ArrayList<>(prices.size());
+        prices.forEach(e ->
+                sellers.add(new ProductSeller(getContent(e.select("span"), "seller"),
+                        "$" + getContent(e.select("span"), "price"),
+                        getContent(e.select("span"), "availability")))
+        );
         final Elements summary = doc.select(SELECTOR_SUMMARY);
         final String rating = summary.select(SELECTOR_RATING).first().text();
         final Elements quickInfo = summary.select(SELECTOR_QUICK_INFO);
@@ -75,6 +86,11 @@ public class CnetSearchResultPageParser {
         final String bottomLine = quickInfo.select(SELECTOR_BOTTOMLINE).first().text();
 
         final ReviewSummary reviewSummary = new ReviewSummary(rating, good, bad, bottomLine);
-        return new ReviewDetail(productName, title, author, reviewSummary);
+        return new ReviewDetail(productName, title, author, msrp, "$" + lowPrice, sellers, reviewSummary);
+    }
+
+    private String getContent(Elements e, String itempropValue) {
+        return e.stream().filter(el -> el.attr("itemprop").equals(itempropValue))
+                .findFirst().orElseGet(null).attr("content");
     }
 }
