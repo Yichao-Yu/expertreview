@@ -12,7 +12,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Map;
 
-import static com.yichao.alexa.expertreview.SessionConstant.*;
+import static com.yichao.alexa.expertreview.SessionConstant.ENTRY_REVIEW_SEARCH;
+import static com.yichao.alexa.expertreview.SessionConstant.SESSION_FLOW_ENTRY;
 
 @Singleton
 public class BuiltInNoIntentHandler extends BaseIntentHandler {
@@ -35,9 +36,6 @@ public class BuiltInNoIntentHandler extends BaseIntentHandler {
             case ENTRY_REVIEW_SEARCH:
                 LOGGER.info("Handling review search no intent");
                 return intentHandlerMap.get(IntentType.PRODUCT_REVIEW_SEARCH).handleNoIntentRequest(intent, session);
-            case ENTRY_PRODUCT_SEARCH:
-                LOGGER.info("Handling search no intent");
-                return intentHandlerMap.get(IntentType.PRODUCT_SEARCH).handleNoIntentRequest(intent, session);
             default:
                 return newTellResponse("Not Implemented yet", false, true);
         }

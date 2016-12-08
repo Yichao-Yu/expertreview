@@ -13,7 +13,6 @@ public final class SessionConstant {
     public static final String SESSION_PROMPTED_REVIEW = "session_prompted_review";
     public static final String SESSION_REVIEW_DETAIL = "session_review_detail";
 
-    public static final String ENTRY_PRODUCT_SEARCH = "entry_product_search";
     public static final String ENTRY_REVIEW_SEARCH = "entry_review_search";
 
     // review search flow states
