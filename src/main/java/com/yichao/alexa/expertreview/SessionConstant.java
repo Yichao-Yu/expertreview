@@ -19,7 +19,6 @@ public final class SessionConstant {
     // review search flow states
     public static final String STATE_REVIEW_SEARCH_INTIAL = "state_review_search_initial";
     public static final String STATE_REVIEW_SEARCH_FIRST_HIT = "state_review_search_first_hit";
-//    public static final String STATE_REVIEW_SEARCH_OTHER_HITS = "state_review_search_other_hits";
     public static final String STATE_REVIEW_SEARCH_SUMMARY = "state_review_search_summary";
     public static final String STATE_REVIEW_SEARCH_GOOD_BAD_BOTTOMLINE = "state_review_search_gbbl";
     public static final String STATE_REVIEW_SEARCH_LINK_CARD = "state_review_search_link_card";

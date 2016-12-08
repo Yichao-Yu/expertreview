@@ -2,22 +2,15 @@ ProductReviewSearchIntent Get review for {Product}
 ProductReviewSearchIntent Find review for {Product}
 ProductReviewSearchIntent Find {Product} review
 ProductReviewSearchIntent What is the review for {Product}
+ProductReviewSearchIntent I want to know review about {Product}
+ProductReviewSearchIntent I would like to hear review about {Product}
+ProductReviewSearchIntent I am interested in {Product}
 
 ProductRateIntent What is the rate for {Product}
 ProductRateIntent What do people rate {Product}
 ProductRateIntent How is the rating for {Product}
 
 ProductGoodRateIntent Is {Product} good
-
-ProductSearchIntent Search for {Product}
-ProductSearchIntent Help me find {Product}
-ProductSearchIntent Find a product called {Product}
-
-OtherReviewResultIntent No that is not what I really want
-OtherReviewResultIntent No that is not what I want
-OtherReviewResultIntent No that is not right
-OtherReviewResultIntent No what else you got
-OtherReviewResultIntent No show me other review search results
 
 AMAZON.RepeatIntent repeat
 AMAZON.RepeatIntent say that again

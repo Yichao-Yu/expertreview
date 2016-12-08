@@ -20,6 +20,8 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductReviewSearchIntentHandler.class);
 
+    private static final int LIMITED_SEARCH_RESULT_SIZE = 4;
+
     @Override
     protected IntentType getIntentType() {
         return IntentType.PRODUCT_REVIEW_SEARCH;
@@ -39,10 +41,17 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
         }
 
         final List<ReviewSearchResult> results;
-        LOGGER.debug("Search product {}", product);
-        // search reviews
-        final String searchPage = cnetPageClient.getSearchResultPage(product);
-        results = cnetSearchResultPageParser.parseSearchResult(searchPage);
+        if (session.getAttributes().containsKey(SESSION_SEARCH_RESULTS)) {
+            LOGGER.debug("Load cached results from session attribute {}", SESSION_SEARCH_RESULTS);
+            // search was done on the same product, read from cache
+            results = getSessionAttribute(session, SESSION_SEARCH_RESULTS, List.class, ReviewSearchResult.class);
+        } else {
+            LOGGER.debug("Search product {}", product);
+            // search reviews
+            final String searchPage = cnetPageClient.getSearchResultPage(product);
+            results = cnetSearchResultPageParser.parseSearchResult(searchPage).subList(0, LIMITED_SEARCH_RESULT_SIZE);
+            session.setAttribute(SESSION_SEARCH_RESULTS, results);
+        }
 
         final ReviewSearchResult firstHit = results.get(0);
         final String responseString = "Find " + firstHit.getReviewType().getDescription() + ": " + firstHit.getTitle()
@@ -66,7 +75,7 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 final String reviewPage = cnetPageClient.getReviewPage(searchResult.getUrl());
                 reviewDetail = cnetSearchResultPageParser.parseReviewDetail(reviewPage);
 
-                final String highlightBreak = "<break time=\"0.2s\"/>";
+                final String highlightBreak = "<break strength='medium'/>";
                 responseString = new StringBuilder("<speak>");
                 responseString.append(reviewDetail.toSummarySsmlString());
                 responseString.append("<s>Do you want to continue for the Good,");
@@ -133,10 +142,24 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
         String responseString;
         switch (state) {
             case STATE_REVIEW_SEARCH_FIRST_HIT:
-                responseString = "Okay. Maybe next time. Bye.";
+                List<ReviewSearchResult> results = null;
+                if (session.getAttributes().containsKey(SESSION_SEARCH_RESULTS)) {
+                    LOGGER.debug("Load cached results from session attribute {}", SESSION_SEARCH_RESULTS);
+                    // search was done on the same product, read from cache
+                    results = getSessionAttribute(session, SESSION_SEARCH_RESULTS, List.class, ReviewSearchResult.class);
+                }
+                if (results == null || results.size() == 1) {
+                    responseString = "<speak><s>Okay.</s><s>Hope I can help.</s><s>Bye.</s></speak>";
+                } else {
+                    final StringBuilder responseBuilder = new StringBuilder();
+                    responseBuilder.append("<speak><s>Okay.</s><s>I also found some related products.</s><s>They are<break time='300ms'/>");
+                    results.forEach(e -> responseBuilder.append(e.getTitle()).append("<break time='300ms'/>"));
+                    responseBuilder.append("</s><s>Which one are you interested in?</s></speak>");
+                    responseString = responseBuilder.toString();
+                }
 
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_END);
-                return newTellResponse(responseString, false, true);
+                return newTellResponse(responseString, true, true);
             case STATE_REVIEW_SEARCH_SUMMARY:
                 responseString = "That's alright. But would you like to read the entire review?";
 
