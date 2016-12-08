@@ -1,12 +1,18 @@
 package com.yichao.alexa.expertreview;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.yichao.alexa.expertreview.intent.IntentRequestHandler;
+import com.yichao.alexa.expertreview.intent.IntentType;
 import com.yichao.alexa.http.client.CnetPageClient;
 import com.yichao.alexa.http.parser.CnetSearchResultPageParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ExpertReviewModule extends AbstractModule {
 
@@ -14,12 +20,15 @@ public class ExpertReviewModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(CnetPageClient.class);
-        bind(CnetSearchResultPageParser.class);
+        bind(CnetPageClient.class).toInstance(new CnetPageClient());
+        bind(CnetSearchResultPageParser.class).toInstance(new CnetSearchResultPageParser());
+        install(new IntentRequestHandlerModule());
     }
 
     @Provides
-    ObjectMapper provideObjectMapper() {
-        return new ObjectMapper();
+    @Singleton
+    @Named("intentHandlerMap")
+    Map<IntentType, IntentRequestHandler> getIntentHandlerMap() {
+        return new HashMap<IntentType, IntentRequestHandler>();
     }
 }

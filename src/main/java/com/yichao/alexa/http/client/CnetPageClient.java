@@ -13,7 +13,7 @@ public class CnetPageClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CnetPageClient.class);
 
-    private static final String CNET_BASE_URL = "https://www.cnet.com";
+    public static final String CNET_BASE_URL = "https://www.cnet.com";
     private static final String CNET_SEARCH_URL = "https://www.cnet.com/search/?query=%s";
     //    private static final String CNET_SEARCH_URL = "https://www.cnet.com/search/?query=%s&typeName=content_review";
     private static final int TIMEOUT = 3000;

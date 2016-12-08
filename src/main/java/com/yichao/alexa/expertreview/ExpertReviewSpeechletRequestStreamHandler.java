@@ -16,7 +16,7 @@ public class ExpertReviewSpeechletRequestStreamHandler extends SpeechletRequestS
 
     static {
         supportedApplicationIds = new HashSet<String>();
-        supportedApplicationIds.add("{app id here}");
+        supportedApplicationIds.add("amzn1.ask.skill.a4ca5824-0a4a-4420-9e38-a95c0cd1386c");
     }
 
     public ExpertReviewSpeechletRequestStreamHandler() {
