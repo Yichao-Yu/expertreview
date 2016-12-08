@@ -1,6 +1,7 @@
 package com.yichao.alexa.model;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ReviewDetail {
 
@@ -84,5 +85,9 @@ public class ReviewDetail {
 
     public ReviewSummary getReviewSummary() {
         return reviewSummary;
+    }
+
+    public List<ProductSeller> getSellerAmazon() {
+        return sellers.stream().filter(e -> e.getSeller().contains("Amazon")).collect(Collectors.toList());
     }
 }

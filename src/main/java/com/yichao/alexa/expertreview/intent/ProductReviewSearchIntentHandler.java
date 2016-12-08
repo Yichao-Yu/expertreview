@@ -5,6 +5,7 @@ import com.amazon.speech.speechlet.Session;
 import com.amazon.speech.speechlet.SpeechletException;
 import com.amazon.speech.speechlet.SpeechletResponse;
 import com.yichao.alexa.http.client.CnetPageClient;
+import com.yichao.alexa.model.ProductSeller;
 import com.yichao.alexa.model.ReviewDetail;
 import com.yichao.alexa.model.ReviewSearchResult;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import java.util.List;
+import java.util.Optional;
 
 import static com.yichao.alexa.expertreview.SessionConstant.*;
 
@@ -123,6 +125,7 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 }
                 responseString = new StringBuilder();
                 responseString.append("The review has been sent to your Alexa device. Take a look.");
+                responseString.append(getAmazaonOfferResponse(reviewDetail));
 
                 session.setAttribute(SESSION_LAST_RESPONSE, responseString.toString());
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_LINK_CARD);
@@ -166,13 +169,42 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_GOOD_BAD_BOTTOMLINE);
                 return newAskResponse(responseString.toString(), true, null, false);
             case STATE_REVIEW_SEARCH_GOOD_BAD_BOTTOMLINE:
+                final ReviewDetail reviewDetail = getSessionAttribute(session, SESSION_REVIEW_DETAIL, ReviewDetail.class);
+                if (reviewDetail == null) {
+                    LOGGER.error("{} is not set in the session", SESSION_REVIEW_DETAIL);
+                    throw new SpeechletException(SESSION_REVIEW_DETAIL + " is not set in the session");
+                }
+
                 responseString = "Have a good day.";
+                responseString += getAmazaonOfferResponse(reviewDetail);
 
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_END);
                 return newTellResponse(responseString.toString(), false, true);
             default:
                 return newTellResponse("Not Implemented yet", false, true);
         }
+    }
+
+    private String getAmazaonOfferResponse(final ReviewDetail reviewDetail) {
+        final StringBuilder responseString = new StringBuilder();
+        final List<ProductSeller> amazonSeller = reviewDetail.getSellerAmazon();
+        if (amazonSeller != null && !amazonSeller.isEmpty()) {
+            Optional<ProductSeller> lowAmazonSeller = amazonSeller.stream().filter(e -> e.getPrice().equals(reviewDetail.getLowPrice())).findFirst();
+            responseString.append("Just one more thing. I just want you to know that ");
+            if (lowAmazonSeller.isPresent()) {
+                final ProductSeller seller = lowAmazonSeller.get();
+                responseString.append(seller.getSeller());
+                responseString.append(" offers the lowest price at ");
+                responseString.append(seller.getPrice());
+            } else {
+                final ProductSeller seller = amazonSeller.get(0);
+                responseString.append("purchase from ");
+                responseString.append(seller.getSeller());
+                responseString.append(" at ");
+                responseString.append(seller.getPrice());
+            }
+        }
+        return responseString.toString();
     }
 
     private void resetSearchAttributes(final Session session) {
