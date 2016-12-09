@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yichao.alexa.expertreview.SpeechletResponseUtil;
 import com.yichao.alexa.http.client.CnetPageClient;
-import com.yichao.alexa.http.parser.CnetSearchResultPageParser;
+import com.yichao.alexa.http.parser.CnetPageParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ public abstract class BaseIntentHandler implements IntentRequestHandler {
     @Inject
     protected CnetPageClient cnetPageClient;
     @Inject
-    protected CnetSearchResultPageParser cnetSearchResultPageParser;
+    protected CnetPageParser cnetPageParser;
 
     @Inject
     public void registerHandler(@Named("intentHandlerMap") final Map<IntentType, IntentRequestHandler> intentHandlerMap) {

@@ -50,7 +50,7 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
             LOGGER.debug("Search product {}", product);
             // search reviews
             final String searchPage = cnetPageClient.getSearchResultPage(product);
-            results = cnetSearchResultPageParser.parseSearchResult(searchPage);
+            results = cnetPageParser.parseSearchResult(searchPage);
             session.setAttribute(SESSION_SEARCH_RESULTS, results);
         }
         if (results == null || results.isEmpty()) {
@@ -77,7 +77,7 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 searchResult = getSessionAttribute(session, SESSION_PROMPTED_REVIEW, ReviewSearchResult.class);
 
                 final String reviewPage = cnetPageClient.getReviewPage(searchResult.getUrl());
-                reviewDetail = cnetSearchResultPageParser.parseReviewDetail(reviewPage);
+                reviewDetail = cnetPageParser.parseReviewDetail(reviewPage);
 
                 final String highlightBreak = "<break strength='medium'/>";
                 responseString = new StringBuilder("<speak>");
@@ -126,15 +126,16 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                     throw new SpeechletException(SESSION_REVIEW_DETAIL + " is not set in the session");
                 }
                 responseString = new StringBuilder();
-                responseString.append("The review has been sent to your Alexa device. Take a look. ");
+                responseString.append("The review has been sent to your Alexa app. Take a look. ");
                 responseString.append(getAmazaonOfferResponse(reviewDetail));
 
                 session.setAttribute(SESSION_LAST_RESPONSE, responseString.toString());
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_LINK_CARD);
                 final String cardContent = reviewDetail.toSummaryString() + "\n" + CnetPageClient.CNET_BASE_URL + searchResult.getUrl();
+
                 return newTellResponseWithCard(responseString.toString(), false,
                         searchResult.getReviewType().getDescription() + ": " + searchResult.getTitle(),
-                        cardContent, searchResult.getImgUrl());
+                        cardContent, null); // TODO load product image from service
 
             default:
                 return newTellResponse("Not Implemented yet", false, true);
@@ -190,7 +191,7 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
     private String getAmazaonOfferResponse(final ReviewDetail reviewDetail) {
         final StringBuilder responseString = new StringBuilder();
         final List<ProductSeller> amazonSeller = reviewDetail.getSellers().stream()
-                .filter(e -> e.getSeller().contains("Amazon")).collect(Collectors.toList());
+                .filter(e -> e.getSeller().contains("Amazon.com")).collect(Collectors.toList());
 
         if (amazonSeller != null && !amazonSeller.isEmpty()) {
             Optional<ProductSeller> lowAmazonSeller = amazonSeller.stream()
@@ -209,6 +210,7 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 responseString.append(" at ");
                 responseString.append(seller.getPrice());
             }
+            responseString.append(". Amazon Prime member can ask Alexa to purchase.");
         }
         return responseString.toString();
     }

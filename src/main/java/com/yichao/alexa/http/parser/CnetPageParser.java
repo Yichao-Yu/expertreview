@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
-public class CnetSearchResultPageParser {
+public class CnetPageParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CnetSearchResultPageParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CnetPageParser.class);
 
     private static final int LIMITED_SEARCH_RESULT_SIZE = 4;
 
@@ -35,7 +35,7 @@ public class CnetSearchResultPageParser {
     private static final String SELECTOR_PRICE_SUMMARY = "div.priceRange";
     private static final String SELECTOR_MSRP = "a.msrpUnit span.msrp";
     private static final String SELECTOR_LOW_PRICE = "span";
-    private static final String SELECTOR_PRICES = "ul > li.reseller";
+    private static final String SELECTOR_RESELLERS = "ul > li.reseller";
     private static final String SELECTOR_RATING = "div.editorsRating span.rating";
     private static final String SELECTOR_QUICK_INFO = "div.quickInfo";
     private static final String SELECTOR_GOOD = ".theGood > span";
@@ -77,12 +77,13 @@ public class CnetSearchResultPageParser {
         final Elements priceSummary = doc.select(SELECTOR_PRICE_SUMMARY);
         final String msrp = getText(priceSummary.select(SELECTOR_MSRP));
         final String lowPrice = getContent(priceSummary.select(SELECTOR_LOW_PRICE), "lowPrice");
-        final Elements prices = doc.select(SELECTOR_PRICES);
-        final List<ProductSeller> sellers = new ArrayList<>(prices.size());
-        prices.forEach(e ->
+        final Elements resellers = doc.select(SELECTOR_RESELLERS);
+        final List<ProductSeller> sellers = new ArrayList<>(resellers.size());
+        resellers.forEach(e ->
                 sellers.add(new ProductSeller(getContent(e.select("span"), "seller"),
                         "$" + getContent(e.select("span"), "price"),
-                        getContent(e.select("span"), "availability")))
+                        getContent(e.select("span"), "availability"),
+                        "https:" + e.select("a").first().attr("href")))
         );
         final Elements summary = doc.select(SELECTOR_SUMMARY);
         final String rating = getText(summary.select(SELECTOR_RATING));

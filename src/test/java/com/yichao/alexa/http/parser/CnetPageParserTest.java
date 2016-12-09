@@ -1,6 +1,5 @@
 package com.yichao.alexa.http.parser;
 
-import com.yichao.alexa.expertreview.intent.BuiltInYesIntentHandler;
 import com.yichao.alexa.http.client.CnetPageClient;
 import com.yichao.alexa.model.ReviewDetail;
 import com.yichao.alexa.model.ReviewSearchResult;
@@ -14,32 +13,31 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 
-public class CnetSearchResultPageParserTest extends BaseIntegrationTest {
+public class CnetPageParserTest extends BaseIntegrationTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CnetSearchResultPageParserTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CnetPageParserTest.class);
 
     @Inject
     private CnetPageClient cnetPageClient;
 
     @Inject
-    private CnetSearchResultPageParser cnetSearchResultPageParser;
-
+    private CnetPageParser cnetPageParser;
 
     @Inject
-    public CnetSearchResultPageParserTest() {
+    public CnetPageParserTest() {
     }
 
     @Test
     public void testSearch() throws IOException {
         final String page = cnetPageClient.getSearchResultPage("bose quietcomfort twenty");
-        final List<ReviewSearchResult> resultInfo = cnetSearchResultPageParser.parseSearchResult(page);
+        final List<ReviewSearchResult> resultInfo = cnetPageParser.parseSearchResult(page);
         Assert.assertFalse(resultInfo.isEmpty());
     }
 
     @Test
     public void testReview() throws Exception {
         final String page = cnetPageClient.getReviewPage("/products/bose-quietcomfort-20/");
-        final ReviewDetail detail = cnetSearchResultPageParser.parseReviewDetail(page);
+        final ReviewDetail detail = cnetPageParser.parseReviewDetail(page);
         Assert.assertNotNull(detail);
         Assert.assertEquals("Bose QuietComfort 20", detail.getProduct());
         Assert.assertEquals("Expensive, best noise-canceling in-ear headphone", detail.getProductTitle().trim());

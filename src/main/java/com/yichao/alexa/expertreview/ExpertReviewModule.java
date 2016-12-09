@@ -5,7 +5,7 @@ import com.google.inject.Provides;
 import com.yichao.alexa.expertreview.intent.IntentRequestHandler;
 import com.yichao.alexa.expertreview.intent.IntentType;
 import com.yichao.alexa.http.client.CnetPageClient;
-import com.yichao.alexa.http.parser.CnetSearchResultPageParser;
+import com.yichao.alexa.http.parser.CnetPageParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,7 @@ public class ExpertReviewModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(CnetPageClient.class).toInstance(new CnetPageClient());
-        bind(CnetSearchResultPageParser.class).toInstance(new CnetSearchResultPageParser());
+        bind(CnetPageParser.class).toInstance(new CnetPageParser());
         install(new IntentRequestHandlerModule());
     }
 
