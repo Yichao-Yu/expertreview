@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Singleton;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.yichao.alexa.expertreview.SessionConstant.*;
 
@@ -21,8 +22,6 @@ import static com.yichao.alexa.expertreview.SessionConstant.*;
 public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductReviewSearchIntentHandler.class);
-
-    private static final int LIMITED_SEARCH_RESULT_SIZE = 4;
 
     @Override
     protected IntentType getIntentType() {
@@ -51,10 +50,13 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
             LOGGER.debug("Search product {}", product);
             // search reviews
             final String searchPage = cnetPageClient.getSearchResultPage(product);
-            results = cnetSearchResultPageParser.parseSearchResult(searchPage).subList(0, LIMITED_SEARCH_RESULT_SIZE);
+            results = cnetSearchResultPageParser.parseSearchResult(searchPage);
             session.setAttribute(SESSION_SEARCH_RESULTS, results);
         }
-
+        if (results == null || results.isEmpty()) {
+            session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_END);
+            return newTellResponse("I cannot find any product you just mentioned. Please try again.", false, true);
+        }
         final ReviewSearchResult firstHit = results.get(0);
         final String responseString = "Find " + firstHit.getReviewType().getDescription() + ": " + firstHit.getTitle()
                 + ". Do you want to listen to the review?";
@@ -124,7 +126,7 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                     throw new SpeechletException(SESSION_REVIEW_DETAIL + " is not set in the session");
                 }
                 responseString = new StringBuilder();
-                responseString.append("The review has been sent to your Alexa device. Take a look.");
+                responseString.append("The review has been sent to your Alexa device. Take a look. ");
                 responseString.append(getAmazaonOfferResponse(reviewDetail));
 
                 session.setAttribute(SESSION_LAST_RESPONSE, responseString.toString());
@@ -132,7 +134,7 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 final String cardContent = reviewDetail.toSummaryString() + "\n" + CnetPageClient.CNET_BASE_URL + searchResult.getUrl();
                 return newTellResponseWithCard(responseString.toString(), false,
                         searchResult.getReviewType().getDescription() + ": " + searchResult.getTitle(),
-                        cardContent, null);
+                        cardContent, searchResult.getImgUrl());
 
             default:
                 return newTellResponse("Not Implemented yet", false, true);
@@ -152,22 +154,22 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                     results = getSessionAttribute(session, SESSION_SEARCH_RESULTS, List.class, ReviewSearchResult.class);
                 }
                 if (results == null || results.size() == 1) {
-                    responseString = "<speak><s>Okay.</s><s>Hope I can help.</s><s>Bye.</s></speak>";
+                    responseString = "Okay. Anytime. Bye.";
                 } else {
                     final StringBuilder responseBuilder = new StringBuilder();
-                    responseBuilder.append("<speak><s>Okay.</s><s>I also found some related products.</s><s>They are<break time='300ms'/>");
-                    results.forEach(e -> responseBuilder.append(e.getTitle()).append("<break time='300ms'/>"));
-                    responseBuilder.append("</s><s>Which one are you interested in?</s></speak>");
+                    responseBuilder.append("Okay. I also found some related products. They are: ");
+                    results.forEach(e -> responseBuilder.append(e.getTitle()).append("; "));
+                    responseBuilder.append("Which one are you interested in?");
                     responseString = responseBuilder.toString();
                 }
 
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_END);
-                return newTellResponse(responseString, true, true);
+                return newTellResponse(responseString, false, true);
             case STATE_REVIEW_SEARCH_SUMMARY:
-                responseString = "That's alright. But would you like to read the entire review?";
+                responseString = "That's alright. But would you like to look at the entire review?";
 
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_GOOD_BAD_BOTTOMLINE);
-                return newAskResponse(responseString.toString(), true, null, false);
+                return newAskResponse(responseString, false, null, false);
             case STATE_REVIEW_SEARCH_GOOD_BAD_BOTTOMLINE:
                 final ReviewDetail reviewDetail = getSessionAttribute(session, SESSION_REVIEW_DETAIL, ReviewDetail.class);
                 if (reviewDetail == null) {
@@ -175,11 +177,11 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                     throw new SpeechletException(SESSION_REVIEW_DETAIL + " is not set in the session");
                 }
 
-                responseString = "Have a good day.";
+                responseString = "Ok. You have a good day. ";
                 responseString += getAmazaonOfferResponse(reviewDetail);
 
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_END);
-                return newTellResponse(responseString.toString(), false, true);
+                return newTellResponse(responseString, false, true);
             default:
                 return newTellResponse("Not Implemented yet", false, true);
         }
@@ -187,18 +189,22 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
 
     private String getAmazaonOfferResponse(final ReviewDetail reviewDetail) {
         final StringBuilder responseString = new StringBuilder();
-        final List<ProductSeller> amazonSeller = reviewDetail.getSellerAmazon();
+        final List<ProductSeller> amazonSeller = reviewDetail.getSellers().stream()
+                .filter(e -> e.getSeller().contains("Amazon")).collect(Collectors.toList());
+
         if (amazonSeller != null && !amazonSeller.isEmpty()) {
-            Optional<ProductSeller> lowAmazonSeller = amazonSeller.stream().filter(e -> e.getPrice().equals(reviewDetail.getLowPrice())).findFirst();
-            responseString.append("Just one more thing. I just want you to know that ");
+            Optional<ProductSeller> lowAmazonSeller = amazonSeller.stream()
+                    .filter(e -> reviewDetail.getLowPrice() == null || e.getPrice().equals(reviewDetail.getLowPrice())).findFirst();
+            responseString.append("Just one more thing. ");
             if (lowAmazonSeller.isPresent()) {
                 final ProductSeller seller = lowAmazonSeller.get();
+                responseString.append(" Right now, ");
                 responseString.append(seller.getSeller());
                 responseString.append(" offers the lowest price at ");
                 responseString.append(seller.getPrice());
             } else {
                 final ProductSeller seller = amazonSeller.get(0);
-                responseString.append("purchase from ");
+                responseString.append("You can purchase from ");
                 responseString.append(seller.getSeller());
                 responseString.append(" at ");
                 responseString.append(seller.getPrice());

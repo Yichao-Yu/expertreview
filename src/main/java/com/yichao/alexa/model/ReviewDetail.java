@@ -40,10 +40,12 @@ public class ReviewDetail {
         sb.append("<s>");
         sb.append(productTitle);
         sb.append("</s>");
-        sb.append("<s>");
-        sb.append("MSRP is ");
-        sb.append(msrp);
-        sb.append("</s>");
+        if (msrp != null) {
+            sb.append("<s>");
+            sb.append("MSRP is ");
+            sb.append(msrp);
+            sb.append("</s>");
+        }
         sb.append(reviewSummary.toRateSsmlString());
         return sb.toString();
     }
@@ -87,7 +89,4 @@ public class ReviewDetail {
         return reviewSummary;
     }
 
-    public List<ProductSeller> getSellerAmazon() {
-        return sellers.stream().filter(e -> e.getSeller().contains("Amazon")).collect(Collectors.toList());
-    }
 }

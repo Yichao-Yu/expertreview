@@ -19,6 +19,10 @@ public class CnetPageClient {
     private static final int TIMEOUT = 3000;
 
     public String getSearchResultPage(final String query) {
+        if (query == null) {
+            LOGGER.warn("No product to search.");
+            return null;
+        }
         try {
             return getPageContent(String.format(CNET_SEARCH_URL, URLEncoder.encode(query, "UTF-8")));
         } catch (IOException ex) {

@@ -39,9 +39,9 @@ public class ReviewSummary {
         final StringBuilder sb = new StringBuilder();
         sb.append("The Good: ");
         sb.append(theGood);
-        sb.append("The Bad: ");
+        sb.append(". The Bad: ");
         sb.append(theBad);
-        sb.append("The Bottom Line: ");
+        sb.append(". The Bottom Line: ");
         sb.append(theBottomLine);
         return sb.toString();
     }

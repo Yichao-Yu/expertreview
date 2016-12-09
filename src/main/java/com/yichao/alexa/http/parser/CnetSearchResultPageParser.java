@@ -12,11 +12,14 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class CnetSearchResultPageParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CnetSearchResultPageParser.class);
+
+    private static final int LIMITED_SEARCH_RESULT_SIZE = 4;
 
     // search page
     private static final String SELECTOR_ITEM_LIST = "section.items > .searchItem.product";
@@ -41,6 +44,9 @@ public class CnetSearchResultPageParser {
 
 
     public List<ReviewSearchResult> parseSearchResult(final String searchPage) {
+        if (searchPage == null) {
+            return Collections.EMPTY_LIST;
+        }
         final Elements searchResultItems = Jsoup.parse(searchPage).select(SELECTOR_ITEM_LIST);
         final List<ReviewSearchResult> resultInfo = new ArrayList<>();
 
@@ -59,17 +65,17 @@ public class CnetSearchResultPageParser {
             }
         });
 
-        return resultInfo;
+        return resultInfo.size() > LIMITED_SEARCH_RESULT_SIZE ? resultInfo.subList(0, LIMITED_SEARCH_RESULT_SIZE) : resultInfo;
     }
 
     public ReviewDetail parseReviewDetail(final String reviewPage) {
         final Document doc = Jsoup.parse(reviewPage);
 
-        final String productName = doc.select(SELECTOR_PRODUCT).first().text();
-        final String title = doc.select(SELECTOR_PRODUCT_TITLE).first().text();
-        final String author = doc.select(SELECTOR_AUTHOR).first().text();
+        final String productName = getText(doc.select(SELECTOR_PRODUCT));
+        final String title = getText(doc.select(SELECTOR_PRODUCT_TITLE));
+        final String author = getText(doc.select(SELECTOR_AUTHOR));
         final Elements priceSummary = doc.select(SELECTOR_PRICE_SUMMARY);
-        final String msrp = priceSummary.select(SELECTOR_MSRP).first().text();
+        final String msrp = getText(priceSummary.select(SELECTOR_MSRP));
         final String lowPrice = getContent(priceSummary.select(SELECTOR_LOW_PRICE), "lowPrice");
         final Elements prices = doc.select(SELECTOR_PRICES);
         final List<ProductSeller> sellers = new ArrayList<>(prices.size());
@@ -79,18 +85,24 @@ public class CnetSearchResultPageParser {
                         getContent(e.select("span"), "availability")))
         );
         final Elements summary = doc.select(SELECTOR_SUMMARY);
-        final String rating = summary.select(SELECTOR_RATING).first().text();
+        final String rating = getText(summary.select(SELECTOR_RATING));
         final Elements quickInfo = summary.select(SELECTOR_QUICK_INFO);
-        final String good = quickInfo.select(SELECTOR_GOOD).first().text();
-        final String bad = quickInfo.select(SELECTOR_BAD).first().text();
-        final String bottomLine = quickInfo.select(SELECTOR_BOTTOMLINE).first().text();
+        final String good = getText(quickInfo.select(SELECTOR_GOOD));
+        final String bad = getText(quickInfo.select(SELECTOR_BAD));
+        final String bottomLine = getText(quickInfo.select(SELECTOR_BOTTOMLINE));
 
         final ReviewSummary reviewSummary = new ReviewSummary(rating, good, bad, bottomLine);
         return new ReviewDetail(productName, title, author, msrp, "$" + lowPrice, sellers, reviewSummary);
     }
 
     private String getContent(Elements e, String itempropValue) {
-        return e.stream().filter(el -> el.attr("itemprop").equals(itempropValue))
-                .findFirst().orElseGet(null).attr("content");
+        Element element = e.stream().filter(el -> el.attr("itemprop").equals(itempropValue))
+                .findFirst().orElse(null);
+        return element != null ? element.attr("content") : null;
+    }
+
+    private String getText(Elements elements) {
+        Optional<Element> element = Optional.ofNullable(elements.first());
+        return element.isPresent() ? element.get().text() : null;
     }
 }

@@ -6,6 +6,9 @@ public class ProductSeller {
     private String price;
     private String availability;
 
+    public ProductSeller() {
+    }
+
     public ProductSeller(String seller, String price, String availability) {
         this.seller = seller;
         this.price = price;
