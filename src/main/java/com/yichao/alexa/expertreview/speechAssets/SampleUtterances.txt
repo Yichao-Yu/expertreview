@@ -7,7 +7,7 @@ ProductReviewSearchIntent I would like to hear review about {Product}
 ProductReviewSearchIntent I am interested in {Product}
 
 ProductRateIntent What is the rate for {Product}
-ProductRateIntent What do people rate {Product}
+ProductRateIntent What do experts rate {Product}
 ProductRateIntent How is the rating for {Product}
 
 ProductGoodRateIntent Is {Product} good
