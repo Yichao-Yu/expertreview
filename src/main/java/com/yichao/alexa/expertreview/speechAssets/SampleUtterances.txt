@@ -11,7 +11,3 @@ ProductRateIntent What do experts rate {Product}
 ProductRateIntent How is the rating for {Product}
 
 ProductGoodRateIntent Is {Product} good
-
-AMAZON.RepeatIntent repeat
-AMAZON.RepeatIntent say that again
-AMAZON.RepeatIntent repeat that
