@@ -21,7 +21,8 @@ public class AmazonPageClient extends HttpPageClient {
             final String page = getPageContent(url);
             return Jsoup.parse(page).select("#imgTagWrapperId img").first().attr("src");
         } catch (IOException ex) {
-            throw new RuntimeException("Failed to query product from amazon.", ex);
+            LOGGER.error("Failed to query product from amazon.", ex);
+            return null;
         }
     }
 }
