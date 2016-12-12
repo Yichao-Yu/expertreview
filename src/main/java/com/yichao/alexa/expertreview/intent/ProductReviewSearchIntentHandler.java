@@ -12,6 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -89,7 +93,7 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 responseString.append("and the Bottom Line ");
                 responseString.append(highlightBreak);
                 responseString.append("about ");
-                responseString.append(getSessionAttribute(session, SESSION_SEARCHED_PRODUCT, String.class).toString());
+                responseString.append(reviewDetail.getProduct());
                 responseString.append("?</s>");
                 responseString.append("</speak>");
 
@@ -129,13 +133,17 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 responseString.append("The review has been sent to your Alexa app. Take a look. ");
                 responseString.append(getAmazaonOfferResponse(reviewDetail));
 
+                String productImageUrl = getAmazonProductImage(reviewDetail);
+                LOGGER.info("Image url is {}", productImageUrl);
+//                productImageUrl = "https://images-na.ssl-images-amazon.com/images/I/91JV0BVwZnL._SY679_.jpg";
+
                 session.setAttribute(SESSION_LAST_RESPONSE, responseString.toString());
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_LINK_CARD);
                 final String cardContent = reviewDetail.toSummaryString() + "\n" + CnetPageClient.CNET_BASE_URL + searchResult.getUrl();
 
                 return newTellResponseWithCard(responseString.toString(), false,
                         searchResult.getReviewType().getDescription() + ": " + searchResult.getTitle(),
-                        cardContent, null); // TODO load product image from service
+                        cardContent, productImageUrl); // TODO load product image from service
 
             default:
                 return newTellResponse("Not Implemented yet", false, true);
@@ -185,6 +193,47 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 return newTellResponse(responseString, false, true);
             default:
                 return newTellResponse("Not Implemented yet", false, true);
+        }
+    }
+
+    private String getAmazonProductImage(final ReviewDetail reviewDetail) {
+        final List<ProductSeller> amazonSeller = reviewDetail.getSellers().stream()
+                .filter(e -> e.getSeller().contains("Amazon.com")).collect(Collectors.toList());
+        if (amazonSeller != null && !amazonSeller.isEmpty()) {
+            URL rawURL;
+            try {
+                rawURL = new URL(amazonSeller.get(0).getLink());
+
+                String query = rawURL.getQuery();
+                String[] qParameters = query.split("&");
+                String destUrl = null;
+                for (String param : qParameters) {
+                    if (param.startsWith("destUrl=")) {
+                        destUrl = param.split("=")[1];
+                        break;
+                    }
+                }
+                String decodedDestUrl = URLDecoder.decode(destUrl, "UTF-8");
+                rawURL = new URL(decodedDestUrl);
+                query = rawURL.getQuery();
+                qParameters = query.split("&");
+                destUrl = null;
+                for (String param : qParameters) {
+                    if (param.startsWith("GR_URL=")) {
+                        destUrl = param.split("=")[1];
+                        break;
+                    }
+                }
+                decodedDestUrl = URLDecoder.decode(URLDecoder.decode(destUrl, "UTF-8"), "UTF-8");
+                return amazonPageClient.getProductImageUrlPage(decodedDestUrl);
+            } catch (MalformedURLException ex) {
+                LOGGER.warn("URL {} is malformed.", amazonSeller.get(0).getLink(), ex);
+                return null;
+            } catch (UnsupportedEncodingException ex) {
+            }
+            return "";
+        } else {
+            return null;
         }
     }
 

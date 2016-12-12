@@ -18,6 +18,9 @@ public class ReviewSummary {
     }
 
     public String toRateSsmlString() {
+        if (rating == null) {
+            return "";
+        }
         final StringBuilder sb = new StringBuilder();
         sb.append("<s>");
         sb.append("Expert rating is ");
@@ -28,6 +31,9 @@ public class ReviewSummary {
     }
 
     public String toRateString() {
+        if (rating == null) {
+            return "";
+        }
         final StringBuilder sb = new StringBuilder();
         sb.append("Expert rating is ");
         sb.append(rating);

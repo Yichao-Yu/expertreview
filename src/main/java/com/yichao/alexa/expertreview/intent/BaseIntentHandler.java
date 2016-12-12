@@ -11,6 +11,7 @@ import com.amazon.speech.ui.StandardCard;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yichao.alexa.expertreview.SpeechletResponseUtil;
+import com.yichao.alexa.http.client.AmazonPageClient;
 import com.yichao.alexa.http.client.CnetPageClient;
 import com.yichao.alexa.http.parser.CnetPageParser;
 import org.slf4j.Logger;
@@ -36,6 +37,8 @@ public abstract class BaseIntentHandler implements IntentRequestHandler {
     protected CnetPageClient cnetPageClient;
     @Inject
     protected CnetPageParser cnetPageParser;
+    @Inject
+    protected AmazonPageClient amazonPageClient;
 
     @Inject
     public void registerHandler(@Named("intentHandlerMap") final Map<IntentType, IntentRequestHandler> intentHandlerMap) {
