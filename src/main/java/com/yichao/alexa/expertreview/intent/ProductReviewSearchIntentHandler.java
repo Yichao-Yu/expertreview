@@ -135,7 +135,6 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
 
                 String productImageUrl = getAmazonProductImage(reviewDetail);
                 LOGGER.info("Image url is {}", productImageUrl);
-//                productImageUrl = "https://images-na.ssl-images-amazon.com/images/I/91JV0BVwZnL._SY679_.jpg";
 
                 session.setAttribute(SESSION_LAST_RESPONSE, responseString.toString());
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_LINK_CARD);
@@ -259,7 +258,7 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 responseString.append(" at ");
                 responseString.append(seller.getPrice());
             }
-            responseString.append(". Amazon Prime member can ask Alexa to purchase.");
+            responseString.append(". Amazon Prime member can purchase through Alexa.");
         }
         return responseString.toString();
     }
