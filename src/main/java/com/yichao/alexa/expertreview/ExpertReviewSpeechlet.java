@@ -35,7 +35,7 @@ public class ExpertReviewSpeechlet implements Speechlet {
     @Override
     public SpeechletResponse onLaunch(LaunchRequest request, Session session) throws SpeechletException {
         LOGGER.info("onLaunch requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
-        return getWelcomeResponse();
+        return getWelcomeResponse(session);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class ExpertReviewSpeechlet implements Speechlet {
         if (intentHandlerMap.containsKey(intentType)) {
             return intentHandlerMap.get(intentType).handleIntentRequest(intent, session);
         }
-        return SpeechletResponseUtil.newTellResponse("I dont understand intent " + intentName, false);
+        return SpeechletResponseUtil.newTellResponse(session, "I dont understand intent " + intentName, false);
     }
 
     @Override
@@ -61,19 +61,13 @@ public class ExpertReviewSpeechlet implements Speechlet {
         LOGGER.info("onSessionEnded requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
     }
 
-    private SpeechletResponse getWelcomeResponse() {
+    private SpeechletResponse getWelcomeResponse(Session session) {
         String speechOutput = "Welcome to Expert Review. "
                 + "Which product would you like to hear review for?";
         String repromptText =
-                "I can find you a product review from an professional review site. "
-                        + "or if you don't know the full name of the product you want to look up review for, "
-                        + "you can say 'Help me find iPhone'. Then you can choose one from the list of products found.";
+                "I can find you a product review from an professional review site.";
 
-        return SpeechletResponseUtil.newAskResponse(speechOutput, false, repromptText, false);
-    }
-
-    private void resetSessionAttributes(final Session session) {
-        session.getAttributes().forEach((key, value) -> session.removeAttribute(key));
+        return SpeechletResponseUtil.newAskResponse(session, speechOutput, false, repromptText, false);
     }
 
 }

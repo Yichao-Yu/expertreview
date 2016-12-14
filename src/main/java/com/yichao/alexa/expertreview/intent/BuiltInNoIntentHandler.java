@@ -32,12 +32,15 @@ public class BuiltInNoIntentHandler extends BaseIntentHandler {
     @Override
     public SpeechletResponse handleIntentRequest(Intent intent, Session session) throws SpeechletException {
         final String flow = getSessionAttribute(session, SESSION_FLOW_ENTRY, String.class);
+        if (flow == null) {
+            return newTellResponse(session, "Not Implemented yet", false, true);
+        }
         switch (flow) {
             case ENTRY_REVIEW_SEARCH:
                 LOGGER.info("Handling review search no intent");
                 return intentHandlerMap.get(IntentType.PRODUCT_REVIEW_SEARCH).handleNoIntentRequest(intent, session);
             default:
-                return newTellResponse("Not Implemented yet", false, true);
+                return newTellResponse(session, "Not Implemented yet", false, true);
         }
     }
 }

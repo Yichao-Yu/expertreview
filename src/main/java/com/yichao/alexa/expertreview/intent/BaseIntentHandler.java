@@ -48,18 +48,18 @@ public abstract class BaseIntentHandler implements IntentRequestHandler {
 
     protected abstract IntentType getIntentType();
 
-    protected SpeechletResponse newTellResponse(final String stringOutput, final boolean isOutputSsml) {
-        return newTellResponse(stringOutput, isOutputSsml, false);
+    protected SpeechletResponse newTellResponse(final Session session, final String stringOutput, final boolean isOutputSsml) {
+        return newTellResponse(session, stringOutput, isOutputSsml, false);
     }
 
-    protected SpeechletResponse newTellResponse(final String stringOutput, final boolean isOutputSsml, final boolean shouldEndSession) {
+    protected SpeechletResponse newTellResponse(final Session session, final String stringOutput, final boolean isOutputSsml, final boolean shouldEndSession) {
         LOGGER.debug("Response stringOutput: [{}]", stringOutput);
-        final SpeechletResponse response = SpeechletResponseUtil.newTellResponse(stringOutput, isOutputSsml);
+        final SpeechletResponse response = SpeechletResponseUtil.newTellResponse(session, stringOutput, isOutputSsml);
         response.setShouldEndSession(shouldEndSession);
         return response;
     }
 
-    protected SpeechletResponse newTellResponseWithCard(final String stringOutput, final boolean isOutputSsml,
+    protected SpeechletResponse newTellResponseWithCard(final Session session, final String stringOutput, final boolean isOutputSsml,
                                                         final String cardTitle, final String cardContent, final String imageUrl) {
         LOGGER.debug("Response stringOutput: [{}]", stringOutput);
         LOGGER.debug("Response card: [title: {}, content: {}]", cardTitle, cardContent);
@@ -76,26 +76,31 @@ public abstract class BaseIntentHandler implements IntentRequestHandler {
             ((SimpleCard) card).setContent(cardContent);
         }
         card.setTitle(cardTitle);
-        final SpeechletResponse response = newTellResponse(stringOutput, isOutputSsml);
+        final SpeechletResponse response = newTellResponse(session, stringOutput, isOutputSsml);
         response.setCard(card);
         response.setShouldEndSession(true); // assuming sending card is the end of session.
         return response;
     }
 
-    protected SpeechletResponse newAskResponse(final String stringOutput, final boolean isOutputSsml,
+    protected SpeechletResponse newAskResponse(final Session session, final String stringOutput, final boolean isOutputSsml,
                                                final String repromptText, final boolean isRepromptSsml) {
         LOGGER.debug("Response stringOutput: [{}]", stringOutput);
-        return SpeechletResponseUtil.newAskResponse(stringOutput, isOutputSsml, repromptText, isRepromptSsml);
+        return SpeechletResponseUtil.newAskResponse(session, stringOutput, isOutputSsml, repromptText, isRepromptSsml);
     }
 
     @Override
     public SpeechletResponse handleYesIntentRequest(Intent intent, Session session) throws SpeechletException {
-        return newTellResponse("Not Implemented yet", false, true);
+        return newTellResponse(session, "Not Implemented yet", false, true);
     }
 
     @Override
     public SpeechletResponse handleNoIntentRequest(Intent intent, Session session) throws SpeechletException {
-        return newTellResponse("Not Implemented yet", false, true);
+        return newTellResponse(session, "Not Implemented yet", false, true);
+    }
+
+    @Override
+    public SpeechletResponse handleHelpIntentRequest(Intent intent, Session session) throws SpeechletException {
+        return newTellResponse(session, "Not Implemented yet", false, true);
     }
 
     @SuppressWarnings("unchecked")

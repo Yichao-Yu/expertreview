@@ -24,9 +24,9 @@ public class BuiltInRepeatIntentHandler extends BaseIntentHandler {
     @Override
     public SpeechletResponse handleIntentRequest(Intent intent, Session session) throws SpeechletException {
         if (session.getAttributes().containsKey(SESSION_LAST_RESPONSE)) {
-            return getSessionAttribute(session, SESSION_LAST_RESPONSE, String.class);
+            return getSessionAttribute(session, SESSION_LAST_RESPONSE, SpeechletResponse.class);
         } else {
-            return newTellResponse("No previous search. Please tell me what product you want to know the review.", false);
+            return newTellResponse(session, "No previous search. Please tell me what product you want to know the review.", false);
         }
     }
 }

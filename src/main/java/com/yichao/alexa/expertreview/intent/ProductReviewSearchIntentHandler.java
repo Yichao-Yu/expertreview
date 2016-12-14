@@ -59,7 +59,7 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
         }
         if (results == null || results.isEmpty()) {
             session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_END);
-            return newTellResponse("I cannot find any product you just mentioned. Please try again.", false, true);
+            return newTellResponse(session, "I cannot find any product you just mentioned. Please try again.", false, true);
         }
         final ReviewSearchResult firstHit = results.get(0);
         final String responseString = "Find " + firstHit.getReviewType().getDescription() + ": " + firstHit.getTitle()
@@ -67,7 +67,7 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
 
         session.setAttribute(SESSION_PROMPTED_REVIEW, firstHit);
         session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_FIRST_HIT);
-        return newAskResponse(responseString, false, "", false);
+        return newAskResponse(session, responseString, false, "", false);
     }
 
     @Override
@@ -97,10 +97,9 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 responseString.append("?</s>");
                 responseString.append("</speak>");
 
-                session.setAttribute(SESSION_LAST_RESPONSE, responseString.toString());
                 session.setAttribute(SESSION_REVIEW_DETAIL, reviewDetail);
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_SUMMARY);
-                return newAskResponse(responseString.toString(), true, null, false);
+                return newAskResponse(session, responseString.toString(), true, null, false);
 
             case STATE_REVIEW_SEARCH_SUMMARY:
                 reviewDetail = getSessionAttribute(session, SESSION_REVIEW_DETAIL, ReviewDetail.class);
@@ -112,11 +111,10 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 responseString = new StringBuilder();
                 responseString.append(reviewDetail.getReviewSummary().toGoodBadBottomLineString());
                 responseString.append("Sounds interesting? ");
-                responseString.append("Would you like to read the entire review?");
+                responseString.append("Would you like to read the full review?");
 
-                session.setAttribute(SESSION_LAST_RESPONSE, responseString.toString());
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_GOOD_BAD_BOTTOMLINE);
-                return newAskResponse(responseString.toString(), false, null, false);
+                return newAskResponse(session, responseString.toString(), false, null, false);
 
             case STATE_REVIEW_SEARCH_GOOD_BAD_BOTTOMLINE:
                 searchResult = getSessionAttribute(session, SESSION_PROMPTED_REVIEW, ReviewSearchResult.class);
@@ -136,16 +134,15 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 String productImageUrl = getAmazonProductImage(reviewDetail);
                 LOGGER.info("Image url is {}", productImageUrl);
 
-                session.setAttribute(SESSION_LAST_RESPONSE, responseString.toString());
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_LINK_CARD);
                 final String cardContent = reviewDetail.toSummaryString() + "\n" + CnetPageClient.CNET_BASE_URL + searchResult.getUrl();
 
-                return newTellResponseWithCard(responseString.toString(), false,
+                return newTellResponseWithCard(session, responseString.toString(), false,
                         searchResult.getReviewType().getDescription() + ": " + searchResult.getTitle(),
                         cardContent, productImageUrl); // TODO load product image from service
 
             default:
-                return newTellResponse("Not Implemented yet", false, true);
+                return newTellResponse(session, "Not Implemented yet", false, true);
         }
     }
 
@@ -172,12 +169,12 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 }
 
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_END);
-                return newTellResponse(responseString, false, true);
+                return newTellResponse(session, responseString, false, true);
             case STATE_REVIEW_SEARCH_SUMMARY:
-                responseString = "That's alright. But would you like to look at the entire review?";
+                responseString = "That's alright. But would you like to look at the full review?";
 
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_GOOD_BAD_BOTTOMLINE);
-                return newAskResponse(responseString, false, null, false);
+                return newAskResponse(session, responseString, false, null, false);
             case STATE_REVIEW_SEARCH_GOOD_BAD_BOTTOMLINE:
                 final ReviewDetail reviewDetail = getSessionAttribute(session, SESSION_REVIEW_DETAIL, ReviewDetail.class);
                 if (reviewDetail == null) {
@@ -189,9 +186,55 @@ public class ProductReviewSearchIntentHandler extends BaseIntentHandler {
                 responseString += getAmazaonOfferResponse(reviewDetail);
 
                 session.setAttribute(SESSION_FLOW_STATE, STATE_REVIEW_SEARCH_END);
-                return newTellResponse(responseString, false, true);
+                return newTellResponse(session, responseString, false, true);
             default:
-                return newTellResponse("Not Implemented yet", false, true);
+                return newTellResponse(session, "Not Implemented yet", false, true);
+        }
+    }
+
+    @Override
+    public SpeechletResponse handleHelpIntentRequest(Intent intent, Session session) throws SpeechletException {
+        final String state = getSessionAttribute(session, SESSION_FLOW_STATE, String.class);
+        final ReviewDetail reviewDetail = getSessionAttribute(session, SESSION_REVIEW_DETAIL, ReviewDetail.class);
+        final String product = getSessionAttribute(session, SESSION_SEARCHED_PRODUCT, String.class);
+        StringBuilder responseString = new StringBuilder();
+        switch (state) {
+            case STATE_REVIEW_SEARCH_FIRST_HIT:
+                responseString.append("Please say 'Yes' or 'No' to confirm whether or not ");
+                responseString.append(reviewDetail != null ? reviewDetail.getProduct() : product);
+                responseString.append(" is the product you want to learn the review for. ");
+                responseString.append("Do you want to listen to the review for ");
+                responseString.append(reviewDetail != null ? reviewDetail.getProduct() : product);
+                responseString.append("?");
+                return newAskResponse(session, responseString.toString(), false, null, false);
+
+            case STATE_REVIEW_SEARCH_SUMMARY:
+                final String highlightBreak = "<break strength='medium'/>";
+                responseString.append("<speak>");
+                responseString.append("<s>Please say 'Yes' or 'No' to confirm if you want to learn the basis on ");
+                responseString.append(reviewDetail != null ? reviewDetail.getProduct() : product);
+                responseString.append("</s>");
+                responseString.append("<s>Do you want to continue for the Good,");
+                responseString.append(highlightBreak);
+                responseString.append("the Bad");
+                responseString.append(highlightBreak);
+                responseString.append("and the Bottom Line ");
+                responseString.append(highlightBreak);
+                responseString.append("about ");
+                responseString.append(reviewDetail != null ? reviewDetail.getProduct() : product);
+                responseString.append("?</s>");
+                responseString.append("</speak>");
+                return newAskResponse(session, responseString.toString(), true, null, false);
+
+            case STATE_REVIEW_SEARCH_GOOD_BAD_BOTTOMLINE:
+                responseString.append("Please say 'Yes' or 'No' to confirm whether or not you want to take a peek at the full review. ");
+                responseString.append("A card will be sent to your Alexa app. ");
+                responseString.append("Would you like to read the full review?");
+
+                return newAskResponse(session, responseString.toString(), false, null, false);
+
+            default:
+                return newTellResponse(session, "Not Implemented yet", false, true);
         }
     }
 
