@@ -1,6 +1,5 @@
 package com.yichao.alexa.http.client;
 
-import org.apache.http.client.fluent.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

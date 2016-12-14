@@ -36,4 +36,13 @@ public interface IntentRequestHandler {
      */
     SpeechletResponse handleNoIntentRequest(Intent intent, Session session) throws SpeechletException;
 
+    /**
+     * handle help intent in a custom intent handler
+     *
+     * @param intent
+     * @param session
+     * @return
+     */
+    SpeechletResponse handleHelpIntentRequest(Intent intent, Session session) throws SpeechletException;
+
 }
