@@ -127,14 +127,6 @@
                         <mainClass>Launcher</mainClass>
                         <systemProperties>
                             <systemProperty>
-                                <key>javax.net.ssl.keyStore</key>
-                                <value>/insert/your/path/java-keystore.jks</value>
-                            </systemProperty>
-                            <systemProperty>
-                                <key>javax.net.ssl.keyStorePassword</key>
-                                <value>insert_your_password</value>
-                            </systemProperty>
-                            <systemProperty>
                                 <key>com.amazon.speech.speechlet.servlet.disableRequestSignatureCheck</key>
                                 <value>${disableRequestSignatureCheck}</value>
                             </systemProperty>
